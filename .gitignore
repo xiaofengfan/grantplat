@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# Node
+node_modules/
+dist/
+build/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Database
+*.db
+*.sqlite3
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend specific
+backend/venv/
+backend/__pycache__/
+*.pyc
+
+# Frontend specific
+frontend/node_modules/
+frontend/dist/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Uvicorn
+*.pid
