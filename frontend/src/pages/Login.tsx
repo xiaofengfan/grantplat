@@ -15,11 +15,12 @@ export default function Login() {
     setLoading(true)
     try {
       const res = await authService.login(values)
-      login(res.user, res.access_token)
+      login(res.data.user, res.data.token)
       message.success('登录成功')
       navigate('/')
-    } catch (error: any) {
-      const detail = error?.response?.data?.detail || '登录失败，请检查邮箱和密码'
+    } catch (error) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const detail = err?.response?.data?.detail || '登录失败，请检查邮箱和密码'
       message.error(detail)
     } finally {
       setLoading(false)
@@ -30,11 +31,12 @@ export default function Login() {
     setLoading(true)
     try {
       const res = await authService.register(values)
-      login(res.user, res.access_token)
+      login(res.data.user, res.data.token)
       message.success('注册成功')
       navigate('/')
-    } catch (error: any) {
-      const detail = error?.response?.data?.detail || '注册失败，请重试'
+    } catch (error) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const detail = err?.response?.data?.detail || '注册失败，请重试'
       message.error(detail)
     } finally {
       setLoading(false)

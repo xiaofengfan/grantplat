@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Row, Col, Card, Statistic, Table, Tag, Space, Progress, List, DatePicker, Button, Typography, Badge, Tooltip } from 'antd'
+import { Row, Col, Card, Statistic, Table, Tag, Space, Progress, List, DatePicker, Button, Typography, Badge, Tooltip, message } from 'antd'
 import {
   RiseOutlined,
   FallOutlined,
@@ -48,6 +48,7 @@ interface Alert {
   alert_type: string
   threshold: number
   condition: string
+  enabled?: boolean
 }
 
 export default function Dashboard() {

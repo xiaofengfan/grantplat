@@ -24,3 +24,66 @@ body {
 #root {
   min-height: 100vh;
 }
+
+@media screen and (max-width: 768px) {
+  .ant-layout {
+    font-size: 14px;
+  }
+
+  .ant-card {
+    border-radius: 8px;
+  }
+
+  .ant-statistic-title {
+    font-size: 12px;
+  }
+
+  .ant-statistic-content {
+    font-size: 18px !important;
+  }
+
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-table-thead > tr > th {
+    padding: 8px 4px !important;
+    font-size: 11px;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+  }
+}
+
+.mobile-hidden {
+  display: block;
+}
+
+.mobile-show {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .mobile-hidden {
+    display: none;
+  }
+
+  .mobile-show {
+    display: block;
+  }
+}
+
+.ant-card-head-title {
+  font-size: 14px;
+}
+
+@media screen and (max-width: 768px) {
+  .ant-card-head-title {
+    font-size: 13px;
+  }
+
+  .ant-card-body {
+    padding: 12px;
+  }
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuantMaster</string>
+    <string name="title_activity_main">QuantMaster</string>
+    <string name="package_name">com.quantmaster.app</string>
+    <string name="custom_url_scheme">com.quantmaster.app</string>
+</resources>

@@ -238,7 +238,7 @@ export default function AutoTrade() {
                     >
                       <List.Item.Meta
                         title={item.name}
-                        description={<Space><Tag size="small">{item.type}</Tag> {item.symbols.join(', ')}</Space>}
+                        description={<Space><Tag>{item.type || '默认'}</Tag> {(item.symbols || []).join(', ')}</Space>}
                       />
                     </List.Item>
                   )}

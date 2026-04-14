@@ -11,7 +11,7 @@ from .ai import router as ai_router
 from .users import router as users_router
 from .config import router as config_router
 from .transactions import router as transactions_router
-from .trading import router as trading_router
+from .trading.router import router as trading_router
 
 api_router = APIRouter()
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Row, Col, Table, Button, Space, Tag, Modal, Form, Input, Select, Tabs, Alert, Statistic, Divider, List, Typography, InputNumber, Badge } from 'antd'
+import { Card, Row, Col, Table, Button, Space, Tag, Modal, Form, Input, Select, Tabs, Alert, Statistic, Divider, List, Typography, InputNumber, Badge, message } from 'antd'
 import { PlusOutlined, SyncOutlined, ThunderboltOutlined, CloudOutlined, LaptopOutlined, RiseOutlined, FallOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import ReactECharts from 'echarts-for-react'
 
@@ -121,7 +121,7 @@ export default function LiveTrade() {
   ]
 
   const handleStockSelect = (stock: typeof stockList[0]) => {
-    setSelectedStock({ ...stock, change: stock.price * stock.change / 100, changePct: stock.change })
+    setSelectedStock({ code: stock.symbol, name: stock.name, price: stock.price ?? 0, change: ((stock.price ?? 0) * ((stock.change ?? 0)) / 100), changePct: stock.change ?? 0 })
     setOrderPrice(stock.price)
   }
 
@@ -312,10 +312,10 @@ export default function LiveTrade() {
             </div>
             <Divider style={{ margin: '8px 0' }} />
             <Row gutter={8}>
-              <Col span={6}><Statistic title="总资产" value={1125840.50} precision={2} prefix="¥" size="small" /></Col>
-              <Col span={6}><Statistic title="持仓市值" value={222470.00} precision={2} prefix="¥" size="small" /></Col>
-              <Col span={6}><Statistic title="可用资金" value={903370.50} precision={2} prefix="¥" size="small" /></Col>
-              <Col span={6}><Statistic title="今日盈亏" value={4420.00} precision={2} prefix="¥" valueStyle={{ color: '#f5222d', fontSize: 14 }} size="small" /></Col>
+              <Col span={6}><Statistic title="总资产" value={1125840.50} precision={2} prefix="¥" valueStyle={{ fontSize: 12 }} /></Col>
+              <Col span={6}><Statistic title="持仓市值" value={222470.00} precision={2} prefix="¥" valueStyle={{ fontSize: 12 }} /></Col>
+              <Col span={6}><Statistic title="可用资金" value={903370.50} precision={2} prefix="¥" valueStyle={{ fontSize: 12 }} /></Col>
+              <Col span={6}><Statistic title="今日盈亏" value={4420.00} precision={2} prefix="¥" valueStyle={{ color: '#f5222d', fontSize: 12 }} /></Col>
             </Row>
           </Card>
         </Col>

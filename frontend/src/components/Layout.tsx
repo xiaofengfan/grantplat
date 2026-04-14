@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Layout as AntLayout, Menu, Avatar, Dropdown, Badge } from 'antd'
+import { Layout as AntLayout, Menu, Avatar, Dropdown, Badge, Drawer, Button } from 'antd'
 import {
   DashboardOutlined,
   ProjectOutlined,
@@ -16,8 +16,11 @@ import {
   AccountBookOutlined,
   StockOutlined,
   RobotOutlined,
+  MenuOutlined,
+  CloseOutlined,
 } from '@ant-design/icons'
 import { useAuthStore } from '../stores/authStore'
+import { Capacitor } from '@capacitor/core'
 
 const { Header, Sider, Content } = AntLayout
 
@@ -36,14 +39,25 @@ const menuItems = [
   { key: '/settings', icon: <SettingOutlined />, label: '系统设置' },
 ]
 
+const bottomNavItems = [
+  { key: '/', icon: <DashboardOutlined />, label: '首页' },
+  { key: '/stockpool', icon: <StockOutlined />, label: '股票' },
+  { key: '/strategies', icon: <ProjectOutlined />, label: '策略' },
+  { key: '/backtest', icon: <ExperimentOutlined />, label: '回测' },
+  { key: '/ai', icon: <RobotOutlined />, label: 'AI' },
+]
+
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false)
+  const [drawerVisible, setDrawerVisible] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const { user, logout } = useAuthStore()
+  const isMobile = Capacitor.isNativePlatform()
 
   const handleMenuClick = ({ key }: { key: string }) => {
     navigate(key)
+    setDrawerVisible(false)
   }
 
   const handleLogout = () => {
@@ -58,7 +72,7 @@ export default function Layout() {
     { key: 'logout', icon: <LogoutOutlined />, label: '退出登录', danger: true },
   ]
 
-  return (
+  const renderDesktopLayout = () => (
     <AntLayout style={{ minHeight: '100vh' }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
@@ -104,4 +118,82 @@ export default function Layout() {
       </AntLayout>
     </AntLayout>
   )
+
+  const renderMobileLayout = () => (
+    <AntLayout style={{ minHeight: '100vh', paddingBottom: 60 }}>
+      <Header style={{ padding: '0 12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <MenuOutlined style={{ fontSize: 18 }} onClick={() => setDrawerVisible(true)} />
+          <span style={{ fontSize: 16, fontWeight: 'bold', color: '#1890ff' }}>QuantMaster</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Badge count={3}>
+            <span style={{ fontSize: 18 }}>🔔</span>
+          </Badge>
+          <Dropdown menu={{ items: userMenuItems, onClick: ({ key }) => key === 'logout' ? handleLogout() : null }}>
+            <Avatar style={{ backgroundColor: '#1890ff', width: 32, height: 32 }} icon={<UserOutlined />} />
+          </Dropdown>
+        </div>
+      </Header>
+
+      <Drawer
+        title={<span style={{ fontWeight: 'bold', color: '#1890ff' }}>QuantMaster</span>}
+        placement="left"
+        onClose={() => setDrawerVisible(false)}
+        open={drawerVisible}
+        width={280}
+        styles={{ body: { padding: 0 } }}
+        extra={
+          <CloseOutlined onClick={() => setDrawerVisible(false)} />
+        }
+      >
+        <Menu
+          theme="light"
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          onClick={handleMenuClick}
+          style={{ borderRight: 0 }}
+        />
+      </Drawer>
+
+      <Content style={{ margin: 70, padding: 12, background: '#f0f2f5', minHeight: 'calc(100vh - 130px)', overflow: 'auto' }}>
+        <Outlet />
+      </Content>
+
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: '#fff',
+        boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
+        display: 'flex',
+        justifyContent: 'space-around',
+        padding: '8px 0',
+        zIndex: 100
+      }}>
+        {bottomNavItems.map(item => (
+          <div
+            key={item.key}
+            onClick={() => handleMenuClick({ key: item.key })}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 4,
+              cursor: 'pointer',
+              color: location.pathname === item.key ? '#1890ff' : '#666',
+              fontSize: 10
+            }}
+          >
+            <span style={{ fontSize: 20 }}>{item.icon}</span>
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </AntLayout>
+  )
+
+  return isMobile ? renderMobileLayout() : renderDesktopLayout()
 }

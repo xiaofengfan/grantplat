@@ -330,15 +330,15 @@ export default function StrategyList() {
                 {selectedStrategy.created_at.split('T')[0]}
               </Descriptions.Item>
               <Descriptions.Item label="年化收益率" span={2}>
-                <Text style={{ color: selectedStrategy.收益率 > 0 ? '#f5222d' : '#52c41a', fontSize: 18, fontWeight: 'bold' }}>
-                  {selectedStrategy.收益率 > 0 ? '+' : ''}{selectedStrategy.收益率.toFixed(2)}%
+                <Text style={{ color: (selectedStrategy.收益率 ?? 0) > 0 ? '#f5222d' : '#52c41a', fontSize: 18, fontWeight: 'bold' }}>
+                  {(selectedStrategy.收益率 ?? 0) > 0 ? '+' : ''}{(selectedStrategy.收益率 ?? 0).toFixed(2)}%
                 </Text>
               </Descriptions.Item>
               <Descriptions.Item label="夏普比率">
-                {selectedStrategy.夏普比率 > 0 ? selectedStrategy.夏普比率.toFixed(2) : '-'}
+                {(selectedStrategy.夏普比率 ?? 0) > 0 ? (selectedStrategy.夏普比率 ?? 0).toFixed(2) : '-'}
               </Descriptions.Item>
               <Descriptions.Item label="最大回撤">
-                {selectedStrategy.最大回撤 > 0 ? <Text style={{ color: '#52c41a' }}>-{selectedStrategy.最大回撤.toFixed(2)}%</Text> : '-'}
+                {(selectedStrategy.最大回撤 ?? 0) > 0 ? <Text style={{ color: '#52c41a' }}>-{(selectedStrategy.最大回撤 ?? 0).toFixed(2)}%</Text> : '-'}
               </Descriptions.Item>
               <Descriptions.Item label="策略描述" span={2}>
                 {selectedStrategy.description}
