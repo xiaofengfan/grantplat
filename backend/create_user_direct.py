@@ -1,22 +1,24 @@
 import sys
 sys.path.insert(0, '.')
 
-from app.main import app
-from app.services import user_service
-from app.schemas import UserCreate
 from app.core.database import SessionLocal
+from app.models import User
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 db = SessionLocal()
 try:
-    user = user_service.create_user(db, UserCreate(
-        username="admin",
-        email="admin@quantmaster.com",
-        password="admin123"
-    ))
-    print(f"User created: {user.id} - {user.username} - {user.email}")
+    user = db.query(User).filter(User.username == "admin").first()
+    if user:
+        print(f"管理员账号已存在:")
+        print(f"  用户名: admin")
+        print(f"  邮箱: {user.email}")
+        print(f"  用户ID: {user.id}")
+        print(f"  密码: admin123 (已设置)")
+    else:
+        print("管理员账号不存在")
 except Exception as e:
-    print(f"Error: {type(e).__name__}: {e}")
-    import traceback
-    traceback.print_exc()
+    print(f"Error: {e}")
 finally:
     db.close()

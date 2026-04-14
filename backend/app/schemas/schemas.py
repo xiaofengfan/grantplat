@@ -368,10 +368,11 @@ class AIConfigResponse(BaseModel):
     enabled: bool
     created_at: datetime
     updated_at: datetime
-    model_name: Optional[str] = None
+    model_display_name: Optional[str] = None
 
     class Config:
         from_attributes = True
+        protected_namespaces = ()
 
 
 class MessageRole(str, Enum):

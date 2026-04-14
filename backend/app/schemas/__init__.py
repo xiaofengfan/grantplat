@@ -10,5 +10,6 @@ from .schemas import (
     StockPoolCreate, StockPoolUpdate, StockPoolResponse, StockAlertCreate, StockAlertResponse,
     AIConfigCreate, AIConfigUpdate, AIConfigResponse, AIChatRequest, AIChatResponse,
     AIConversationResponse, AIAnalyzeRequest, AISignalResponse, AIProvider, MessageRole,
-    PaginatedResponse, ApiResponse
+    PaginatedResponse, ApiResponse,
+    AIModelInfo, ALL_AI_MODELS, DEEPSEEK_MODELS, OPENAI_MODELS, QWEN_MODELS, KIMI_MODELS
 )

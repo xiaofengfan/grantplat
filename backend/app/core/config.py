@@ -21,6 +21,10 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:8000"]
 
+    DEEPSEEK_API_KEY: str = "sk-0c8df273129442b6b8bdfa2bca0198a0"
+    DEEPSEEK_MODEL: str = "deepseek-chat"
+    DEEPSEEK_ENABLED: bool = True
+
     class Config:
         env_file = ".env"
         case_sensitive = True

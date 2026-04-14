@@ -18,6 +18,7 @@ import {
   RobotOutlined,
   MenuOutlined,
   CloseOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons'
 import { useAuthStore } from '../stores/authStore'
 import { Capacitor } from '@capacitor/core'
@@ -26,6 +27,7 @@ const { Header, Sider, Content } = AntLayout
 
 const menuItems = [
   { key: '/', icon: <DashboardOutlined />, label: '工作台' },
+  { key: '/market', icon: <LineChartOutlined />, label: '行情' },
   { key: '/stockpool', icon: <StockOutlined />, label: '股票池' },
   { key: '/strategies', icon: <ProjectOutlined />, label: '策略管理' },
   { key: '/auto-trade', icon: <ThunderboltOutlined />, label: '自动交易' },

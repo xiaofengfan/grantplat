@@ -4,6 +4,7 @@ import httpx
 from datetime import datetime
 from ..models import AIConfig, AIConversation, AISignal, AIProvider as ModelAIProvider
 from ..schemas import AIConfigCreate, AIConfigUpdate, AIChatRequest, AIAnalyzeRequest, MessageRole as ModelMessageRole, ALL_AI_MODELS
+from ..core.config import settings
 
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
@@ -22,7 +23,19 @@ API_URLS = {
 class AIService:
     @staticmethod
     def get_config(db: Session, user_id: int) -> Optional[AIConfig]:
-        return db.query(AIConfig).filter(AIConfig.user_id == user_id).first()
+        config = db.query(AIConfig).filter(AIConfig.user_id == user_id).first()
+        if config:
+            return config
+        if settings.DEEPSEEK_ENABLED and settings.DEEPSEEK_API_KEY:
+            default_config = AIConfig(
+                user_id=user_id,
+                provider=ModelAIProvider.DEEPSEEK,
+                api_key=settings.DEEPSEEK_API_KEY,
+                model=settings.DEEPSEEK_MODEL,
+                enabled=True
+            )
+            return default_config
+        return None
 
     @staticmethod
     def save_config(db: Session, user_id: int, config: AIConfigCreate) -> AIConfig:
@@ -56,25 +69,31 @@ class AIService:
         if not config or not config.api_key:
             return "请先配置AI API密钥"
 
-        user_message = AIConversation(
-            user_id=user_id,
-            symbol=request.symbol,
-            role=ModelMessageRole.USER,
-            content=request.message
-        )
-        db.add(user_message)
-        db.commit()
+        try:
+            user_message = AIConversation(
+                user_id=user_id,
+                symbol=request.symbol,
+                role=ModelMessageRole.USER,
+                content=request.message
+            )
+            db.add(user_message)
+            db.commit()
+        except Exception as e:
+            db.rollback()
 
         messages = [
             {"role": "system", "content": "你是一个专业的股票量化交易分析师，擅长分析股票的技术面和基本面。请给出专业、简洁的投资建议。"}
         ]
 
-        recent_messages = db.query(AIConversation).filter(
-            AIConversation.user_id == user_id
-        ).order_by(AIConversation.created_at.desc()).limit(10).all()
+        try:
+            recent_messages = db.query(AIConversation).filter(
+                AIConversation.user_id == user_id
+            ).order_by(AIConversation.created_at.desc()).limit(10).all()
 
-        for msg in reversed(recent_messages):
-            messages.append({"role": msg.role.value, "content": msg.content})
+            for msg in reversed(recent_messages):
+                messages.append({"role": msg.role.value, "content": msg.content})
+        except Exception:
+            pass
 
         if request.symbol:
             messages.append({"role": "user", "content": f"请重点分析股票 {request.symbol}"})
@@ -93,16 +112,21 @@ class AIService:
                 data = response.json()
                 assistant_message = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
-                db_assistant_message = AIConversation(
-                    user_id=user_id,
-                    symbol=request.symbol,
-                    role=ModelMessageRole.ASSISTANT,
-                    content=assistant_message
-                )
-                db.add(db_assistant_message)
-                db.commit()
+                try:
+                    db_assistant_message = AIConversation(
+                        user_id=user_id,
+                        symbol=request.symbol,
+                        role=ModelMessageRole.ASSISTANT,
+                        content=assistant_message
+                    )
+                    db.add(db_assistant_message)
+                    db.commit()
+                except Exception:
+                    db.rollback()
 
                 return assistant_message
+        except httpx.HTTPStatusError as e:
+            return f"AI服务HTTP错误: {e.response.status_code}"
         except Exception as e:
             return f"AI服务调用失败: {str(e)}"
 
@@ -118,7 +142,7 @@ class AIService:
         if not config or not config.api_key:
             return "请先配置AI API密钥"
 
-        analysis_prompt = f"""请对股票 {request.symbol} 进行{request.analysis_type}分析，包括：
+        analysis_prompt = request.message if hasattr(request, 'message') and request.message else f"""请对股票 {request.symbol} 进行{request.analysis_type}分析，包括：
 1. 基本面分析（市盈率、净利润、营收增长等）
 2. 技术面分析（K线形态、均线系统、技术指标等）
 3. 资金面分析（主力资金流向、成交量变化等）
@@ -131,11 +155,11 @@ class AIService:
             {"role": "user", "content": analysis_prompt}
         ]
 
-        api_url = config.endpoint if config.endpoint else (DEEPSEEK_API_URL if config.provider == ModelAIProvider.DEEPSEEK else OPENAI_API_URL)
         model = config.model if config.model else "deepseek-chat"
+        api_url = config.endpoint if config.endpoint else API_URLS.get(config.provider.value, DEEPSEEK_API_URL)
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with httpx.AsyncClient(timeout=120.0) as client:
                 response = await client.post(
                     api_url,
                     json={"model": model, "messages": messages},
@@ -145,18 +169,23 @@ class AIService:
                 data = response.json()
                 analysis = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
-                signal = AISignal(
-                    user_id=user_id,
-                    symbol=request.symbol,
-                    signal_type=request.analysis_type,
-                    direction="hold",
-                    strength=50,
-                    reason=analysis[:500]
-                )
-                db.add(signal)
-                db.commit()
+                try:
+                    signal = AISignal(
+                        user_id=user_id,
+                        symbol=request.symbol,
+                        signal_type=request.analysis_type,
+                        direction="hold",
+                        strength=50,
+                        reason=analysis[:500]
+                    )
+                    db.add(signal)
+                    db.commit()
+                except Exception:
+                    db.rollback()
 
                 return analysis
+        except httpx.HTTPStatusError as e:
+            return f"AI分析HTTP错误: {e.response.status_code}"
         except Exception as e:
             return f"AI分析失败: {str(e)}"
 

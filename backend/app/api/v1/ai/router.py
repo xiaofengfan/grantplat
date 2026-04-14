@@ -5,13 +5,27 @@ from ....core.database import get_db
 from ....schemas import (
     AIConfigCreate, AIConfigUpdate, AIConfigResponse,
     AIChatRequest, AIChatResponse,
-    AIConversationResponse, AIAnalyzeRequest, AISignalResponse
+    AIConversationResponse, AIAnalyzeRequest, AISignalResponse,
+    ALL_AI_MODELS, DEEPSEEK_MODELS, OPENAI_MODELS, QWEN_MODELS, KIMI_MODELS
 )
 from ....services import ai_service
 from ....api.v1.auth.router import get_current_user
 from ....schemas import UserResponse
 
 router = APIRouter(prefix="/ai", tags=["AI分析"])
+
+
+@router.get("/models")
+def get_available_models():
+    return {
+        "models": [m.model_dump() for m in ALL_AI_MODELS],
+        "providers": [
+            {"id": "deepseek", "name": "DeepSeek"},
+            {"id": "openai", "name": "OpenAI"},
+            {"id": "qwen", "name": "通义千问"},
+            {"id": "kimi", "name": "Kimi"},
+        ]
+    }
 
 
 @router.get("/config", response_model=Optional[AIConfigResponse])

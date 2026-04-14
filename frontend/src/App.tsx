@@ -16,6 +16,7 @@ import StockPool from './pages/StockPool'
 import AIAssistant from './pages/AIAssistant'
 import Settings from './pages/Settings'
 import AutoTrade from './pages/AutoTrade'
+import MarketOverview from './pages/MarketOverview'
 import { ReactNode } from 'react'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -46,6 +47,7 @@ function App() {
         <Route path="risk" element={<RiskMonitor />} />
         <Route path="data" element={<DataCenter />} />
         <Route path="ai" element={<AIAssistant />} />
+        <Route path="market" element={<MarketOverview />} />
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>
