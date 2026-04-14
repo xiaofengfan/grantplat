@@ -3,11 +3,20 @@ from typing import List, Optional
 import httpx
 from datetime import datetime
 from ..models import AIConfig, AIConversation, AISignal, AIProvider as ModelAIProvider
-from ..schemas import AIConfigCreate, AIConfigUpdate, AIChatRequest, AIAnalyzeRequest, MessageRole as ModelMessageRole
+from ..schemas import AIConfigCreate, AIConfigUpdate, AIChatRequest, AIAnalyzeRequest, MessageRole as ModelMessageRole, ALL_AI_MODELS
 
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
+QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+KIMI_API_URL = "https://api.moonshot.cn/v1/chat/completions"
+
+API_URLS = {
+    "deepseek": DEEPSEEK_API_URL,
+    "openai": OPENAI_API_URL,
+    "qwen": QWEN_API_URL,
+    "kimi": KIMI_API_URL,
+}
 
 
 class AIService:
@@ -70,11 +79,11 @@ class AIService:
         if request.symbol:
             messages.append({"role": "user", "content": f"请重点分析股票 {request.symbol}"})
 
-        api_url = config.endpoint if config.endpoint else (DEEPSEEK_API_URL if config.provider == ModelAIProvider.DEEPSEEK else OPENAI_API_URL)
-        model = config.model if config.model else "deepseek-chat"
+        model = request.model if request.model else (config.model if config.model else "deepseek-chat")
+        api_url = config.endpoint if config.endpoint else API_URLS.get(config.provider.value, DEEPSEEK_API_URL)
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with httpx.AsyncClient(timeout=120.0) as client:
                 response = await client.post(
                     api_url,
                     json={"model": model, "messages": messages},

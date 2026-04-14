@@ -303,6 +303,43 @@ class StockAlertResponse(BaseModel):
 class AIProvider(str, Enum):
     DEEPSEEK = "deepseek"
     OPENAI = "openai"
+    QWEN = "qwen"
+    KIMI = "kimi"
+
+
+class AIModelInfo(BaseModel):
+    id: str
+    name: str
+    provider: AIProvider
+    description: str = ""
+
+
+DEEPSEEK_MODELS = [
+    AIModelInfo(id="deepseek-chat", name="DeepSeek Chat", provider=AIProvider.DEEPSEEK, description="通用对话模型"),
+    AIModelInfo(id="deepseek-coder", name="DeepSeek Coder", provider=AIProvider.DEEPSEEK, description="代码生成模型"),
+    AIModelInfo(id="deepseek-reasoner", name="DeepSeek Reasoner", provider=AIProvider.DEEPSEEK, description="推理模型"),
+]
+
+OPENAI_MODELS = [
+    AIModelInfo(id="gpt-4o", name="GPT-4o", provider=AIProvider.OPENAI, description="最新旗舰模型"),
+    AIModelInfo(id="gpt-4o-mini", name="GPT-4o Mini", provider=AIProvider.OPENAI, description="轻量级模型"),
+    AIModelInfo(id="gpt-4-turbo", name="GPT-4 Turbo", provider=AIProvider.OPENAI, description="高性能模型"),
+    AIModelInfo(id="gpt-3.5-turbo", name="GPT-3.5 Turbo", provider=AIProvider.OPENAI, description="快速对话模型"),
+]
+
+QWEN_MODELS = [
+    AIModelInfo(id="qwen-plus", name="通义千问 Plus", provider=AIProvider.QWEN, description="增强版模型"),
+    AIModelInfo(id="qwen-turbo", name="通义千问 Turbo", provider=AIProvider.QWEN, description="快速响应模型"),
+    AIModelInfo(id="qwen-max", name="通义千问 Max", provider=AIProvider.QWEN, description="旗舰模型"),
+]
+
+KIMI_MODELS = [
+    AIModelInfo(id="moonshot-v1-8k", name="Moonshot V1 8K", provider=AIProvider.KIMI, description="8K上下文"),
+    AIModelInfo(id="moonshot-v1-32k", name="Moonshot V1 32K", provider=AIProvider.KIMI, description="32K上下文"),
+    AIModelInfo(id="moonshot-v1-128k", name="Moonshot V1 128K", provider=AIProvider.KIMI, description="128K超长上下文"),
+]
+
+ALL_AI_MODELS = DEEPSEEK_MODELS + OPENAI_MODELS + QWEN_MODELS + KIMI_MODELS
 
 
 class AIConfigCreate(BaseModel):
@@ -331,6 +368,7 @@ class AIConfigResponse(BaseModel):
     enabled: bool
     created_at: datetime
     updated_at: datetime
+    model_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -345,6 +383,7 @@ class MessageRole(str, Enum):
 class AIChatRequest(BaseModel):
     message: str
     symbol: Optional[str] = None
+    model: Optional[str] = None
 
 
 class AIChatResponse(BaseModel):

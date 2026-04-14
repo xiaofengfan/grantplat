@@ -1,0 +1,7 @@
+feat(mobile): Add Android mobile app support with Capacitor
+
+- Integrate Capacitor framework for native Android deployment
+- Add responsive mobile UI with bottom navigation and drawer menu
+- Fix TypeScript errors in multiple components
+- Configure Android build settings with splash screen support
+- Update .gitignore for mobile build artifacts
